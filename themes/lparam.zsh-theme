@@ -1,7 +1,7 @@
 
 #local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 
-PROMPT='%{$fg_bold[red]%}%{$fg_bold[green]%}%n%{$FG[089]%} @ %{$fg_bold[blue]%}%m\
+PROMPT='%{$fg_bold[red]%}%{$fg_bold[green]%}%n%{$FG[220]%} @ %{$fg_bold[blue]%}%m\
 %{$fg_bold[green]%}%p %{$fg[cyan]%}%{$FG[037]%}in %{$fg[cyan]%}%~ %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}%{$reset_color%}
 %{$PROMPT_PROMPT%}%{$fg_bold[red]%}>%{$fg_bold[yellow]%}>%{$fg_bold[cyan]%}>%{$reset_color%}'
 
