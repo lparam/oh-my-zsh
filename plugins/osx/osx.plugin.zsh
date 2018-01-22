@@ -1,9 +1,5 @@
-# ------------------------------------------------------------------------------
-#          FILE:  osx.plugin.zsh
-#   DESCRIPTION:  oh-my-zsh plugin file.
-#        AUTHOR:  Sorin Ionescu (sorin.ionescu@gmail.com)
-#       VERSION:  1.1.0
-# ------------------------------------------------------------------------------
+# Open the current directory in a Finder window
+alias ofd='open_command $PWD'
 
 function _omz_osx_get_frontmost_app() {
   local the_app=$(
@@ -46,6 +42,16 @@ EOF
       end tell
 EOF
 
+  elif [[ "$the_app" == 'iTerm2' ]]; then
+      osascript <<EOF
+        tell application "iTerm2"
+          tell current window
+            create tab with default profile
+            tell current session to write text "${command}"
+          end tell
+        end tell
+EOF
+
   else
     echo "tab: unsupported terminal app: $the_app"
     false
@@ -73,6 +79,19 @@ function vsplit_tab() {
       end tell
 EOF
 
+  elif [[ "$the_app" == 'iTerm2' ]]; then
+      osascript <<EOF
+        tell application "iTerm2"
+          tell current session of first window
+            set newSession to (split vertically with same profile)
+            tell newSession
+              write text "${command}"
+              select
+            end tell
+          end tell
+        end tell
+EOF
+
   else
     echo "$0: unsupported terminal app: $the_app" >&2
     false
@@ -98,6 +117,19 @@ function split_tab() {
         end tell
         keystroke "${command} \n"
       end tell
+EOF
+
+  elif [[ "$the_app" == 'iTerm2' ]]; then
+      osascript <<EOF
+        tell application "iTerm2"
+          tell current session of first window
+            set newSession to (split horizontally with same profile)
+            tell newSession
+              write text "${command}"
+              select
+            end tell
+          end tell
+        end tell
 EOF
 
   else
@@ -143,6 +175,7 @@ function quick-look() {
 function man-preview() {
   man -t "$@" | open -f -a Preview
 }
+compdef _man man-preview
 
 function vncviewer() {
   open vnc://$@
@@ -151,6 +184,7 @@ function vncviewer() {
 # iTunes control function
 function itunes() {
 	local opt=$1
+	local playlist=$2
 	shift
 	case "$opt" in
 		launch|play|pause|stop|rewind|resume|quit)
@@ -167,6 +201,19 @@ function itunes() {
 		vol)
 			opt="set sound volume to $1" #$1 Due to the shift
 			;;
+		playlist)
+		# Inspired by: https://gist.github.com/nakajijapan/ac8b45371064ae98ea7f
+if [[ ! -z "$playlist" ]]; then
+                    		osascript -e 'tell application "iTunes"' -e "set new_playlist to \"$playlist\" as string" -e "play playlist new_playlist" -e "end tell" 2>/dev/null;
+				if [[ $? -eq 0 ]]; then
+					opt="play"
+				else
+					opt="stop"
+				fi	
+                  else
+                    opt="set allPlaylists to (get name of every playlist)"
+                  fi
+                ;;
 		playing|status)
 			local state=`osascript -e 'tell application "iTunes" to player state as string'`
 			if [[ "$state" = "playing" ]]; then
@@ -217,6 +264,7 @@ EOF
 			echo "\tshuf|shuffle [on|off|toggle]\tSet shuffled playback. Default: toggle. Note: toggle doesn't support the MiniPlayer."
 			echo "\tvol\tSet the volume, takes an argument from 0 to 100"
 			echo "\tplaying|status\tShow what song is currently playing in iTunes."
+			echo "\tplaylist [playlist name]\t Play specific playlist"
 			echo "\thelp\tshow this message and exit"
 			return 0
 			;;
@@ -227,3 +275,10 @@ EOF
 	esac
 	osascript -e "tell application \"iTunes\" to $opt"
 }
+
+# Spotify control function
+source ${ZSH}/plugins/osx/spotify
+
+# Show/hide hidden files in the Finder
+alias showfiles="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hidefiles="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
