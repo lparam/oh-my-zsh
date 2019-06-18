@@ -43,7 +43,10 @@ function jira() {
     echo "Opening new issue"
     open_command "${jira_url}/secure/CreateIssue!default.jspa"
   elif [[ "$action" == "assigned" || "$action" == "reported" ]]; then
-    _jira_query $@
+    _jira_query ${@:-$action}
+  elif [[ "$action" == "myissues" ]]; then
+    echo "Opening my issues"
+    open_command "${jira_url}/issues/?filter=-1"
   elif [[ "$action" == "dashboard" ]]; then
     echo "Opening dashboard"
     if [[ "$JIRA_RAPID_BOARD" == "true" ]]; then
@@ -60,7 +63,7 @@ function jira() {
   else
     # Anything that doesn't match a special action is considered an issue name
     # but `branch` is a special case that will parse the current git branch
-    if [[ "$action" == "br" ]]; then
+    if [[ "$action" == "branch" ]]; then
       local issue_arg=$(git rev-parse --abbrev-ref HEAD)
       local issue="${jira_prefix}${issue_arg}"
     else
