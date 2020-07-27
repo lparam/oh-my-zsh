@@ -8,10 +8,12 @@ is found it will just cat the file normally, without syntax highlighting.
 
 ## Setup
 
-To use it, add colorize to the plugins array of your zshrc file:
+To use it, add colorize to the plugins array of your `~/.zshrc` file:
 ```
 plugins=(... colorize)
 ```
+## Configuration
+
 ## Configuration
 
 ### Requirements
@@ -29,7 +31,7 @@ Colorize supports `pygmentize` and `chroma` as syntax highlighter. By default co
 ZSH_COLORIZE_TOOL=chroma
 ```
 
-## Styles
+### Styles
 
 Pygments offers multiple styles. By default, the `default` style is used, but you can choose another theme by setting the `ZSH_COLORIZE_STYLE` environment variable:
 
